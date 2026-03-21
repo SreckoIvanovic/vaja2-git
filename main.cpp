@@ -53,5 +53,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    if (!writeNumbers("out.txt", numbers)) {
+        return 1;
+    }
+
     return 0;
 }
