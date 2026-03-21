@@ -24,6 +24,23 @@ bool readNumbers(const string& fileName, vector<unsigned char>& numbers) {
     return true;
 }
 
+bool writeNumbers(const string& fileName, const vector<unsigned char>& numbers) {
+    ofstream out(fileName.c_str());
+    if (!out.is_open()) {
+        return false;
+    }
+
+    for (size_t i = 0; i < numbers.size(); i++) {
+        out << static_cast<int>(numbers[i]);
+        if (i + 1 < numbers.size()) {
+            out << " ";
+        }
+    }
+
+    out.close();
+    return true;
+}
+
 int main(int argc, char* argv[]) {
     if (argc != 2) {
         return 1;
@@ -33,6 +50,10 @@ int main(int argc, char* argv[]) {
     vector<unsigned char> numbers;
 
     if (!readNumbers(inputFile, numbers)) {
+        return 1;
+    }
+
+    if (!writeNumbers("out.txt", numbers)) {
         return 1;
     }
 
