@@ -41,6 +41,32 @@ bool writeNumbers(const string& fileName, const vector<unsigned char>& numbers) 
     return true;
 }
 
+vector<int> stableSortBitIndexes(const vector<unsigned char>& a, int bitIndex) {
+    size_t n = a.size();
+
+    vector<int> bits(n);
+    for (size_t i = 0; i < n; i++) {
+        bits[i] = (a[i] >> bitIndex) & 1;
+    }
+
+    vector<int> count(2, 0);
+    for (size_t i = 0; i < n; i++) {
+        count[bits[i]]++;
+    }
+
+    count[1] = count[1] + count[0];
+
+    vector<int> sortedIndexes(n);
+
+    for (int i = static_cast<int>(n) - 1; i >= 0; i--) {
+        int bit = bits[i];
+        sortedIndexes[count[bit] - 1] = i;
+        count[bit]--;
+    }
+
+    return sortedIndexes;
+}
+
 int main(int argc, char* argv[]) {
     if (argc != 2) {
         return 1;
