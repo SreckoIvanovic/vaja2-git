@@ -13,6 +13,10 @@ bool readNumbers(const string& fileName, vector<unsigned char>& numbers) {
 
     int value;
     while (in >> value) {
+        if (value < 0 || value > 255) {
+            in.close();
+            return false;
+        }
         numbers.push_back(static_cast<unsigned char>(value));
     }
 
