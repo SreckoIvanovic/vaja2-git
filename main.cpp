@@ -94,6 +94,8 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    binaryRadixSort(numbers);
+    
     if (!writeNumbers("out.txt", numbers)) {
         return 1;
     }
