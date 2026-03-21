@@ -69,6 +69,19 @@ vector<int> stableSortBitIndexes(const vector<unsigned char>& a, int bitIndex) {
     return sortedIndexes;
 }
 
+void binaryRadixSort(vector<unsigned char>& a) {
+    for (int bitIndex = 0; bitIndex < 8; bitIndex++) {
+        vector<int> sortedIndexes = stableSortBitIndexes(a, bitIndex);
+        vector<unsigned char> b(a.size());
+
+        for (size_t i = 0; i < a.size(); i++) {
+            b[i] = a[sortedIndexes[i]];
+        }
+
+        a = b;
+    }
+}
+
 int main(int argc, char* argv[]) {
     if (argc != 2) {
         return 1;
