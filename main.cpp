@@ -41,6 +41,7 @@ bool writeNumbers(const string& fileName, const vector<unsigned char>& numbers) 
     return true;
 }
 
+// stableSortBitIndexes vrne indekse elementov po stabilnem sortiranju izbranega bita
 vector<int> stableSortBitIndexes(const vector<unsigned char>& a, int bitIndex) {
     size_t n = a.size();
 
@@ -54,6 +55,7 @@ vector<int> stableSortBitIndexes(const vector<unsigned char>& a, int bitIndex) {
         count[bits[i]]++;
     }
 
+    // pretvorba stevil pojavitev v koncne pozicije
     count[1] = count[1] + count[0];
 
     vector<int> sortedIndexes(n);
