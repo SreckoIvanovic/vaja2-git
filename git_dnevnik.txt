@@ -1,0 +1,22 @@
+*   d9f4342 (HEAD -> main, origin/main) Merge pull request #4 from SreckoIvanovic/feature/radix-core
+|\  
+| * c56d921 (origin/feature/radix-core, feature/radix-core) Dodal klic radix sortiranja v glavni program
+| * 6eac194 Dodal glavno zanko binarnega radix sorta
+|/  
+*   66f6476 Merge pull request #3 from SreckoIvanovic/feature/bit-sort
+|\  
+| * 89f0506 (origin/feature/bit-sort, feature/bit-sort) Implementiral stabilno sortiranje bitov z indeksi
+| * c93675a Dodal pridobivanje k-tega bita za vse elemente
+|/  
+*   19a4184 Merge pull request #2 from SreckoIvanovic/feature/output
+|\  
+| * c4b2646 (origin/feature/output, feature/output) Dodal klic funkcije za zapis v main
+| * b73cc59 Dodal zapis stevil v izhodno datoteko
+|/  
+*   2961b74 Merge pull request #1 from SreckoIvanovic/feature/input
+|\  
+| * 85523d6 (origin/feature/input, feature/input) Dodal preverjanje veljavnosti vhodnih podatkov
+| * 6adf455 Implementiral branje stevil iz vhodne datoteke
+|/  
+* 731de9a Odstranil .vscode iz repozitorija in dodal v .gitignore
+* a24abee Inicijalizacija projekta
