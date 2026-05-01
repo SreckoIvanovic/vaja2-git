@@ -1,14 +1,21 @@
 # Dockerfile za C++ konzolno aplikacijo.
-# Slika vsebuje prevajalnik g++ in projektno kodo.
-# Program se prevede med gradnjo Docker slike.
+# Uporabljen je multi-stage build, zato je koncna Docker slika majhna.
+# GCC se uporabi samo za prevajanje, v DockerHub pa gre samo majhna koncna slika.
 
-FROM gcc:13
+FROM gcc:13-alpine AS build
 
 WORKDIR /app
 
-COPY . .
+COPY main.cpp .
 
-RUN g++ -std=c++17 -Wall -Wextra -pedantic main.cpp -o vaja2
+RUN g++ -std=c++17 -O2 -static main.cpp -o vaja2
+
+
+FROM alpine:3.20
+
+WORKDIR /app
+
+COPY --from=build /app/vaja2 .
 
 RUN echo "10 3 255 0 7 128 64 1" > vhod.txt
 
