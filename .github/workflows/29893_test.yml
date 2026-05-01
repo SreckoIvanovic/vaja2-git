@@ -1,0 +1,78 @@
+# 29893_test.yml
+# Skripta za sprotno integracijo.
+# Ob potisku na vejo main prevede C++ program, izvede testno skripto
+# in rezultat shrani v artefakt napaka.txt.
+
+name: 29893_test
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  testiranje:
+    name: Testiranje C++ programa
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        compiler: [g++]
+
+    steps:
+      # Prenos kode iz GitHub repozitorija.
+      - name: Prenos kode
+        uses: actions/checkout@v4
+
+      # Namestitev prevajalnika g++.
+      - name: Namestitev orodij
+        run: |
+          sudo apt update
+          sudo apt install -y g++ make
+
+      # Zagon testne skripte.
+      # Ce test pade, se opis napake zapise v napaka.txt.
+      - name: Zagon testov
+        run: |
+          rm -f napaka.txt
+          touch napaka.txt
+
+          chmod +x test.sh
+
+          if ! ./test.sh; then
+            echo "Testiranje C++ programa ni uspelo." > napaka.txt
+          fi
+
+      # Shranjevanje datoteke napaka.txt kot artefakt.
+      - name: Shranjevanje artefakta
+        uses: actions/upload-artifact@v4
+        with:
+          name: napaka-${{ matrix.compiler }}
+          path: napaka.txt
+
+  preverjanje:
+    name: Preverjanje rezultata testiranja
+    runs-on: self-hosted
+    needs: testiranje
+
+    steps:
+      # Prenos artefakta iz prvega posla.
+      - name: Prenos artefakta
+        uses: actions/download-artifact@v4
+        with:
+          path: artefakti
+
+      # Ce je napaka.txt neprazna, se drugi posel prekine.
+      - name: Preverjanje datoteke napaka.txt
+        run: |
+          find artefakti -type f -name "napaka.txt" -print
+
+          for file in $(find artefakti -type f -name "napaka.txt"); do
+            if [ -s "$file" ]; then
+              echo "Najdena napaka:"
+              cat "$file"
+              exit 1
+            fi
+          done
+
+          echo "Datoteka napaka.txt je prazna. Testiranje je uspelo."
