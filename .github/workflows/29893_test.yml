@@ -1,7 +1,7 @@
-# 29893_test.yml
 # Skripta za sprotno integracijo.
-# Ob potisku na vejo main prevede C++ program, izvede testno skripto
-# in rezultat shrani v artefakt napaka.txt.
+# Ob potisku na vejo main prevede C++ program z razlicnimi standardi C++,
+# standardno napako preusmeri v datoteko napaka.txt in jo shrani kot artefakt.
+# Drugi posel preveri vsebino artefakta in javi napako, ce testiranje ni uspelo.
 
 name: 29893_test
 
@@ -17,37 +17,43 @@ jobs:
 
     strategy:
       matrix:
-        compiler: [g++]
+        cpp_standard: [17, 20]
 
     steps:
       # Prenos kode iz GitHub repozitorija.
       - name: Prenos kode
         uses: actions/checkout@v4
 
-      # Namestitev prevajalnika g++.
+      # Namestitev prevajalnika g++ in orodja make.
       - name: Namestitev orodij
         run: |
           sudo apt update
           sudo apt install -y g++ make
 
-      # Zagon testne skripte.
-      # Ce test pade, se opis napake zapise v napaka.txt.
-      - name: Zagon testov
+      # Priprava datoteke napaka.txt in preverjanje obstoja testne skripte.
+      - name: Priprava in preverjanje testne skripte
         run: |
           rm -f napaka.txt
           touch napaka.txt
-
-          chmod +x test.sh
-
-          if ! ./test.sh; then
-            echo "Testiranje C++ programa ni uspelo." > napaka.txt
+          if [ ! -f test.sh ]; then
+            echo "Testna skripta test.sh ne obstaja." > napaka.txt
+            exit 1
           fi
 
+      # Izvede testiranje. Standardna napaka se preusmeri v datoteko napaka.txt.
+      # || true zagotovi, da korak ne pade takoj, ampak napaka se shrani v artefakt.
+      - name: Zagon testov
+        run: |
+          chmod +x test.sh
+          CPP_STANDARD=${{ matrix.cpp_standard }} ./test.sh 2> napaka.txt || true
+
       # Shranjevanje datoteke napaka.txt kot artefakt.
+      # if: always() zagotovi, da se artefakt shrani tudi ce testiranje ni uspelo.
       - name: Shranjevanje artefakta
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: napaka-${{ matrix.compiler }}
+          name: napaka-cpp${{ matrix.cpp_standard }}
           path: napaka.txt
 
   preverjanje:
@@ -56,23 +62,23 @@ jobs:
     needs: testiranje
 
     steps:
-      # Prenos artefakta iz prvega posla.
-      - name: Prenos artefakta
+      # Prenos vseh artefaktov iz prvega posla.
+      - name: Prenos artefaktov
         uses: actions/download-artifact@v4
         with:
           path: artefakti
 
-      # Ce je napaka.txt neprazna, se drugi posel prekine.
-      - name: Preverjanje datoteke napaka.txt
+      # Ce je katerakoli datoteka napaka.txt neprazna, se posel prekine z napako.
+      - name: Preverjanje datotek napaka.txt
         run: |
           find artefakti -type f -name "napaka.txt" -print
 
           for file in $(find artefakti -type f -name "napaka.txt"); do
             if [ -s "$file" ]; then
-              echo "Najdena napaka:"
+              echo "Najdena napaka v: $file"
               cat "$file"
               exit 1
             fi
           done
 
-          echo "Datoteka napaka.txt je prazna. Testiranje je uspelo."
+          echo "Vse datoteke napaka.txt so prazne. Testiranje je uspelo."

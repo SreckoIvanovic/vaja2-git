@@ -1,4 +1,3 @@
-# 29893_deploy.yml
 # Skripta za dostavo kode.
 # Zazene se po uspesnem zakljucku workflowa 29893_test,
 # zgradi Docker sliko in jo objavi na DockerHub.
@@ -17,7 +16,8 @@ jobs:
     name: Gradnja in objava Docker slike
     runs-on: self-hosted
 
-    # Deploy se izvede samo, ce je bil testni workflow uspesen.
+    # Deploy se izvede samo, ce je bil testni workflow uspesen
+    # in ce je datoteka napaka.txt prazna (ni napak).
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
